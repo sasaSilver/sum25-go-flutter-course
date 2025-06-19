@@ -29,18 +29,36 @@ type TaskManager struct {
 // NewTaskManager creates a new task manager
 func NewTaskManager() *TaskManager {
 	// TODO: Implement this function
-	return nil
+	return &TaskManager{
+		tasks: make(map[int]Task),
+		nextID: 1,
+	}
 }
 
 // AddTask adds a new task to the manager, returns an error if the title is empty, and increments the nextID
 func (tm *TaskManager) AddTask(title, description string) (Task, error) {
-	// TODO: Implement this function
-	return Task{}, nil
+	if title == "" {
+		return Task{}, ErrEmptyTitle
+	}
+	task := Task{tm.nextID, title, description, false, time.Now()}
+	tm.tasks[tm.nextID] = task
+	tm.nextID++
+	return task, nil
 }
 
 // UpdateTask updates an existing task, returns an error if the title is empty or the task is not found
 func (tm *TaskManager) UpdateTask(id int, title, description string, done bool) error {
-	// TODO: Implement this function
+	task, ok := tm.tasks[id]
+	if !ok {
+		return ErrTaskNotFound
+	}
+	if title == "" {
+		return ErrEmptyTitle
+	}
+	task.Title = title
+	task.Description = description
+	task.Done = done
+	tm.tasks[id] = task
 	return nil
 }
 
