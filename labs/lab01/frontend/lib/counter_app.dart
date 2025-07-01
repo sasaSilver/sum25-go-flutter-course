@@ -14,24 +14,15 @@ class _CounterAppState extends State<CounterApp> {
     setState(() {
       _counter += 1;
     });
-    setState(() {
-      _counter += 1;
-    });
   }
 
   void _decrement() {
     setState(() {
       _counter -= 1;
     });
-    setState(() {
-      _counter -= 1;
-    });
   }
 
   void _reset() {
-    setState(() {
-      _counter = 0;
-    });
     setState(() {
       _counter = 0;
     });
