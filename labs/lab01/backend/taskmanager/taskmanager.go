@@ -64,18 +64,30 @@ func (tm *TaskManager) UpdateTask(id int, title, description string, done bool) 
 
 // DeleteTask removes a task from the manager, returns an error if the task is not found
 func (tm *TaskManager) DeleteTask(id int) error {
-	// TODO: Implement this function
+	_, ok := tm.tasks[id]
+	if !ok {
+		return ErrTaskNotFound
+	}
+	delete(tm.tasks, id)
 	return nil
 }
 
 // GetTask retrieves a task by ID, returns an error if the task is not found
 func (tm *TaskManager) GetTask(id int) (Task, error) {
-	// TODO: Implement this function
-	return Task{}, nil
+	task, ok := tm.tasks[id]
+	if !ok {
+		return Task{}, ErrTaskNotFound
+	}
+	return task, nil
 }
 
 // ListTasks returns all tasks, optionally filtered by done status, returns an empty slice if no tasks are found
 func (tm *TaskManager) ListTasks(filterDone *bool) []Task {
-	// TODO: Implement this function
-	return nil
+	tasks := make([]Task, 0, len(tm.tasks))
+	for _, task := range tm.tasks {
+		if filterDone == nil || *filterDone == task.Done {
+			tasks = append(tasks, task)
+		}
+	}
+	return tasks
 }
