@@ -35,6 +35,7 @@ func (h *Handler) SetupRoutes() *mux.Router {
 
 	messageRouter := router.PathPrefix("/messages").Subrouter()
 	messageRouter.Methods("GET").Path("").HandlerFunc(h.GetMessages)
+	messageRouter.Methods("GET").Path("/{id}").HandlerFunc(h.GetMessageByID)
 	messageRouter.Methods("POST").Path("").HandlerFunc(h.CreateMessage)
 	messageRouter.Methods("PUT").Path("/{id}").HandlerFunc(h.UpdateMessage)
 	messageRouter.Methods("DELETE").Path("/{id}").HandlerFunc(h.DeleteMessage)
@@ -196,6 +197,30 @@ func getHTTPStatusDescription(code int) string {
 		description = "Unknown Status"
 	}
 	return description
+}
+
+func (h *Handler) GetMessageByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		h.writeError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+	message, err := h.DB.GetByID(id)
+	if err != nil {
+		if err == storage.ErrInvalidID {
+			h.writeError(w, http.StatusNotFound, "Message not found")
+		} else {
+			h.writeError(w, http.StatusInternalServerError, "Failed to get message")
+		}
+		return
+	}
+	response := models.APIResponse{
+		Success: true,
+		Data:    message,
+	}
+	h.writeJSON(w, http.StatusOK, response)
 }
 
 // CORS middleware
